@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { registerApi } from "../../services/api";
 import { showSuccessToast, showErrorToast } from "../ToastNotifications";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../../context/AuthContext";
 
 const Register = () => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -21,11 +25,18 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await registerApi(form);
+      const { data } = await registerApi(form);
+      const { user, token } = data;
+      login(user, token);
+      navigate(user?.role === "admin" ? "/admin" : "/dashboard");
       showSuccessToast("Registration successful!");
       setForm({ name: "", email: "", password: "" });
     } catch (error) {
-      showErrorToast("Registration failed. Please try again.");
+      console.log(error)
+      showErrorToast(
+        error?.response
+?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 

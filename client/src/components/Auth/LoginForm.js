@@ -24,8 +24,8 @@ function Login() {
       const { data } = await loginApi(form);
       const { user, token } = data;
       login(user, token);
-      showSuccessToast("Login successful!");
       navigate(user?.role === "admin" ? "/admin" : "/dashboard");
+      showSuccessToast("Login successful!");
     } catch (error) {
       showErrorToast("Invalid credentials. Please try again.");
     }
